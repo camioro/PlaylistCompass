@@ -1,47 +1,50 @@
-﻿body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background-color: #1DB954;
-    color: white;
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #1DB954;
+  color: white;
 }
-
 h1, h2 {
-    color: #FFFFFF;
+  color: #FFFFFF;
 }
-
 form, .container {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
-
 .container {
-    background-color: #191414;
-    padding: 20px;
-    border-radius: 10px;
+  background-color: #191414;
+  padding: 20px;
+  border-radius: 10px;
 }
-
 button {
-    background-color: #1DB954;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
+  background-color: #1DB954;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
 }
-
-    button:hover {
-        background-color: #14833b;
-    }
-
-.playlist, .question {
-    margin-bottom: 15px;
+button:hover {
+  background-color: #14833b;
 }
-
+img {
+  max-width: 200px;
+  margin-bottom: 20px;
+}
+.playlist {
+  margin-bottom: 20px;
+}
+.playlist img {
+  width: 100%;
+  border-radius: 5px;
+}
+.playlist h3 {
+  margin-top: 10px;
+}
 @media (max-width: 600px) {
-    body {
-        margin: 10px;
-    }
-
-    .container {
-        padding: 15px;
-    }
+  body {
+    margin: 10px;
+  }
+  .container {
+    padding: 15px;
+  }
 }
