@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recomendador de Playlist</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Recomendador de Playlist</h1>
+    <div class="container">
+        <form id="playlistForm">
+            <label for="usuario">Introduce tu usuario de Spotify:</label>
+            <input type="text" id="usuario" name="usuario" required>
+            <button type="button" onclick="obtenerPlaylists()">Obtener Playlists</button>
+        </form>
+        <div id="playlists"></div>
+        <div id="questionnaire"></div>
+        <div id="resultado"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
