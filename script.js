@@ -24,15 +24,23 @@ function obtenerIdCliente() {
       'Authorization': 'Bearer ' + token
     }
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Usuario no encontrado en Spotify. Verifica que el nombre de usuario sea correcto.');
+    }
+    return response.json();
+  })
   .then(data => {
-    const fotoPerfil = data.images.length > 0 ? data.images[0].url : 'https://via.placeholder.com/150';
+    if (!data.images || data.images.length === 0) {
+      throw new Error('No se encontró una foto de perfil para el usuario.');
+    }
+    const fotoPerfil = data.images[0].url;
     document.getElementById('fotoPerfil').src = fotoPerfil;
     obtenerPlaylists(usuario);
   })
   .catch(error => {
     console.error('Error al obtener ID de cliente:', error);
-    alert('Error al obtener ID de cliente');
+    alert('Error al obtener ID de cliente: ' + error.message);
   });
 }
 
