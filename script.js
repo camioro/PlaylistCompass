@@ -4,6 +4,7 @@ let token;
 const redirectUri = 'https://camioro.github.io/PlaylistCompass/'; // URL proporcionado
 const scopes = 'playlist-read-private playlist-read-collaborative';
 
+// Función para obtener el token al cargar la página
 function obtenerToken() {
   const hashParams = window.location.hash.substr(1).split('&');
   for (let i = 0; i < hashParams.length; i++) {
@@ -15,6 +16,7 @@ function obtenerToken() {
   }
 }
 
+// Función para obtener el ID de cliente y mostrar la foto de perfil del usuario
 function obtenerIdCliente() {
   const usuario = document.getElementById('usuario').value;
   fetch(`https://api.spotify.com/v1/users/${usuario}`, {
@@ -24,7 +26,8 @@ function obtenerIdCliente() {
   })
   .then(response => response.json())
   .then(data => {
-    mostrarFotoPerfil(data.images[0].url);
+    const fotoPerfil = data.images.length > 0 ? data.images[0].url : 'https://via.placeholder.com/150';
+    document.getElementById('fotoPerfil').src = fotoPerfil;
     obtenerPlaylists(usuario);
   })
   .catch(error => {
@@ -33,10 +36,7 @@ function obtenerIdCliente() {
   });
 }
 
-function mostrarFotoPerfil(urlFotoPerfil) {
-  document.getElementById('fotoPerfil').src = urlFotoPerfil;
-}
-
+// Función para obtener las playlists del usuario y mostrarlas en la página
 function obtenerPlaylists(usuario) {
   fetch(`https://api.spotify.com/v1/users/${usuario}/playlists`, {
     headers: {
@@ -47,7 +47,7 @@ function obtenerPlaylists(usuario) {
   .then(data => {
     const playlists = data.items.map(item => ({
       nombre: item.name,
-      portada: item.images.length > 0 ? item.images[0].url : 'https://via.placeholder.com/150', // Si no hay imagen de portada, se usa una imagen de marcador de posición
+      portada: item.images.length > 0 ? item.images[0].url : 'https://via.placeholder.com/150'
     }));
     mostrarPlaylists(playlists);
   })
@@ -57,6 +57,7 @@ function obtenerPlaylists(usuario) {
   });
 }
 
+// Función para mostrar las playlists en la página
 function mostrarPlaylists(playlists) {
   let playlistHtml = '<h2>Playlists:</h2>';
   playlists.forEach(playlist => {
@@ -69,5 +70,5 @@ function mostrarPlaylists(playlists) {
   document.getElementById('playlists').innerHTML = playlistHtml;
 }
 
-// Función para obtener el token al cargar la página
+// Obtener token al cargar la página
 obtenerToken();
