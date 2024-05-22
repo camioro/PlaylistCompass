@@ -1,25 +1,155 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recomendador de Playlist</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Playlist Compass</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #191414;
+      color: #1DB954;
+      text-align: center;
+      padding: 20px;
+    }
+    .playlist {
+      display: inline-block;
+      margin: 10px;
+    }
+    .playlist img {
+      width: 150px;
+      height: 150px;
+    }
+    #fotoPerfil {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      margin: 20px;
+      display: none;
+    }
+    .instructions {
+      background-color: #282828;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: left;
+      display: inline-block;
+      color: #fff;
+    }
+  </style>
 </head>
 <body>
-  <h1>Recomendador de Playlist</h1>
-  <div class="container">
-    <form id="playlistForm">
-      <label for="usuario">Introduce tu nombre de usuario de Spotify:</label>
-      <input type="text" id="usuario" name="usuario" required>
-      <button type="button" onclick="obtenerIdCliente()">Obtener Playlists</button>
-    </form>
-    <img id="fotoPerfil" src="" alt="Foto de perfil">
-    <div id="playlists"></div>
-    <div id="questionnaire"></div>
-    <div id="resultado"></div>
+  <h1>Playlist Compass</h1>
+  <div class="instructions">
+    <h2>Instrucciones:</h2>
+    <ol>
+      <li>Abre Spotify en tu navegador.</li>
+      <li>Ve a tu perfil de usuario:
+        <ul>
+          <li>Haz clic en tu nombre de usuario en la parte superior derecha.</li>
+          <li>Selecciona "Perfil" en el menú desplegable.</li>
+        </ul>
+      </li>
+      <li>Copia el enlace a tu perfil:
+        <ul>
+          <li>En la barra de direcciones del navegador, copia el enlace completo. Debería verse algo así: <code>https://open.spotify.com/user/tu_nombre_de_usuario</code>.</li>
+        </ul>
+      </li>
+      <li>Pega el enlace en el campo de texto a continuación y presiona "Buscar".</li>
+    </ol>
   </div>
+  <div>
+    <input type="text" id="perfil" placeholder="Ingrese el enlace a su perfil de Spotify">
+    <button onclick="obtenerPerfil()">Buscar</button>
+  </div>
+  <img id="fotoPerfil" src="" alt="Foto de perfil del usuario">
+  <div id="playlists"></div>
 
-  <script src="script.js"></script>
+  <script>
+    const clientId = '1fe145a390ff4b7a8491a5db45858b13';
+    let token;
+
+    const redirectUri = 'https://camioro.github.io/PlaylistCompass/';
+    const scopes = 'playlist-read-private playlist-read-collaborative';
+
+    function obtenerToken() {
+      const hashParams = window.location.hash.substr(1).split('&');
+      for (let i = 0; i < hashParams.length; i++) {
+        const [key, value] = hashParams[i].split('=');
+        if (key === 'access_token') {
+          token = value;
+          break;
+        }
+      }
+      console.log('Token obtenido:', token);
+    }
+
+    function obtenerPerfil() {
+      const perfilUrl = document.getElementById('perfil').value;
+      const usuario = perfilUrl.split('/user/')[1];
+      console.log('Usuario extraído:', usuario);
+      fetch(`https://api.spotify.com/v1/users/${usuario}`, {
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      })
+      .then(response => {
+        console.log('Respuesta de la API de Spotify:', response);
+        if (!response.ok) {
+          throw new Error('Usuario no encontrado en Spotify. Verifica que el enlace sea correcto.');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Datos del usuario:', data);
+        if (!data.images || data.images.length === 0) {
+          throw new Error('No se encontró una foto de perfil para el usuario.');
+        }
+        const fotoPerfil = data.images[0].url;
+        document.getElementById('fotoPerfil').src = fotoPerfil;
+        document.getElementById('fotoPerfil').style.display = 'block';
+        obtenerPlaylists(usuario);
+      })
+      .catch(error => {
+        console.error('Error al obtener ID de cliente:', error);
+        alert('Error al obtener ID de cliente: ' + error.message);
+      });
+    }
+
+    function obtenerPlaylists(usuario) {
+      fetch(`https://api.spotify.com/v1/users/${usuario}/playlists`, {
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Playlists del usuario:', data);
+        const playlists = data.items.map(item => ({
+          nombre: item.name,
+          portada: item.images.length > 0 ? item.images[0].url : 'https://via.placeholder.com/150'
+        }));
+        mostrarPlaylists(playlists);
+      })
+      .catch(error => {
+        console.error('Error al obtener playlists:', error);
+        alert('Error al obtener playlists');
+      });
+    }
+
+    function mostrarPlaylists(playlists) {
+      let playlistHtml = '<h2>Playlists:</h2>';
+      playlists.forEach(playlist => {
+        playlistHtml += `
+          <div class="playlist">
+            <img src="${playlist.portada}" alt="${playlist.nombre}">
+            <h3>${playlist.nombre}</h3>
+          </div>`;
+      });
+      document.getElementById('playlists').innerHTML = playlistHtml;
+    }
+
+    obtenerToken();
+  </script>
 </body>
 </html>
